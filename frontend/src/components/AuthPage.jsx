@@ -71,7 +71,7 @@ export default function AuthPage({ onAuth }) {
             <h1 className="auth-brand-title">Build stunning resumes<br/>with AI power</h1>
             <p className="auth-brand-sub">
               Create ATS-optimized resumes, get AI-powered suggestions, and generate 
-              portfolio websites — all in one beautiful flow.
+              portfolio websites - all in one beautiful flow.
             </p>
             <div className="auth-features">
               <div className="auth-feature">
