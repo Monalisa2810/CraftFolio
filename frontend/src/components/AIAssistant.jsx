@@ -80,7 +80,7 @@ export default function AIAssistant({ data, setData, next, prev }) {
         <div className="cf-section-eyebrow">Step 02</div>
         <h1 className="cf-section-title">Let AI do the heavy lifting</h1>
         <p className="cf-section-sub">
-          Generate a professional summary, check your ATS score, and get skill recommendations — all powered by Claude AI.
+          Generate a professional summary, check your ATS score, and get skill recommendations.
         </p>
       </div>
 
@@ -118,7 +118,7 @@ export default function AIAssistant({ data, setData, next, prev }) {
             {errors.summary && !loading.summary && <AIError message={errors.summary} onRetry={genSummary} />}
             {data.summary && !loading.summary && (
               <div>
-                <div className="ai-result-badge">✨ AI Generated — edit as needed</div>
+                <div className="ai-result-badge">✨ AI Generated - edit as needed</div>
                 <textarea
                   className="cf-textarea ai-textarea"
                   value={data.summary}
@@ -137,7 +137,7 @@ export default function AIAssistant({ data, setData, next, prev }) {
           <div className="cf-card-head">
             <div>
               <div className="cf-card-title">Career Objective</div>
-              <div className="cf-card-sub">For freshers — replaces summary on resume</div>
+              <div className="cf-card-sub">For freshers - replaces summary on resume</div>
             </div>
             <AIButton onClick={genObjective} loading={loading.objective} label="Generate Objective" />
           </div>
@@ -152,7 +152,7 @@ export default function AIAssistant({ data, setData, next, prev }) {
             {errors.objective && !loading.objective && <AIError message={errors.objective} onRetry={genObjective} />}
             {data.objective && !loading.objective && (
               <div>
-                <div className="ai-result-badge">✨ AI Generated — edit as needed</div>
+                <div className="ai-result-badge">✨ AI Generated - edit as needed</div>
                 <textarea
                   className="cf-textarea ai-textarea"
                   value={data.objective}
@@ -196,7 +196,7 @@ export default function AIAssistant({ data, setData, next, prev }) {
             {errors.skills && !loading.skills && <AIError message={errors.skills} onRetry={genSkills} />}
             {suggestions.length > 0 && !loading.skills && (
               <div>
-                <div className="cf-label" style={{ marginBottom: 12 }}>Suggested skills — click to add</div>
+                <div className="cf-label" style={{ marginBottom: 12 }}>Suggested skills - click to add</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                   {suggestions.map((s) => (
                     <button
