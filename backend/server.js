@@ -2,8 +2,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Resume from "./models/Resume.js";
+import User from "./models/User.js";
+import authMiddleware from "./authMiddleware.js";
 
 dotenv.config();
 
@@ -46,11 +49,93 @@ async function askGemini(systemPrompt, userPrompt, retries = 3) {
   }
 }
 
-// ── Save to MongoDB ───────────────────────────────────────────────────────
-app.post("/api/save-resume", async (req, res) => {
+// ── Auth: Generate JWT ────────────────────────────────────────────────────
+function generateToken(userId) {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+}
+
+// ── Auth: Register ────────────────────────────────────────────────────────
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters." });
+    }
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({ error: "An account with this email already exists." });
+    }
+
+    const user = new User({ name, email, password });
+    await user.save();
+
+    const token = generateToken(user._id);
+    res.status(201).json({
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (err) {
+    console.error("Register error:", err);
+    if (err.code === 11000) {
+      return res.status(409).json({ error: "An account with this email already exists." });
+    }
+    res.status(500).json({ error: "Registration failed. Please try again." });
+  }
+});
+
+// ── Auth: Login ───────────────────────────────────────────────────────────
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required." });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid email or password." });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid email or password." });
+    }
+
+    const token = generateToken(user._id);
+    res.json({
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ error: "Login failed. Please try again." });
+  }
+});
+
+// ── Auth: Get current user ────────────────────────────────────────────────
+app.get("/api/auth/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    res.json({ user: { id: user._id, name: user.name, email: user.email } });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch user." });
+  }
+});
+
+// ── Save to MongoDB (protected) ──────────────────────────────────────────
+app.post("/api/save-resume", authMiddleware, async (req, res) => {
   try {
     const { profileData } = req.body;
-    const newResume = new Resume(profileData);
+    const newResume = new Resume({ ...profileData, userId: req.userId });
     await newResume.save();
     res.json({ success: true, message: "Saved to cloud successfully!" });
   } catch (err) {

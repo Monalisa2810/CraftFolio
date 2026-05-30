@@ -4,7 +4,8 @@ import AIAssistant from "./components/AIAssistant";
 import TemplatePicker from "./components/TemplatePicker";
 import ResumePreview from "./components/ResumePreview";
 import PortfolioGenerator from "./components/PortfolioGenerator";
-import { fetchFromServer } from "./api";
+import AuthPage from "./components/AuthPage";
+import { fetchFromServer, setAuthToken, getAuthToken, authMe } from "./api";
 
 const STEPS = [
   { id: 0, label: "Your Story", icon: "✦", desc: "Personal details" },
@@ -32,9 +33,30 @@ export default function App() {
   const [mounted, setMounted] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Auth state
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // Check for existing token on mount
   useEffect(() => {
-    setMounted(true);
-    // Persist to localStorage
+    const checkAuth = async () => {
+      const token = getAuthToken();
+      if (token) {
+        try {
+          const data = await authMe();
+          if (data?.user) {
+            setUser(data.user);
+          }
+        } catch {
+          setAuthToken(null);
+        }
+      }
+      setAuthLoading(false);
+      setMounted(true);
+    };
+    checkAuth();
+
+    // Persist resume data from localStorage
     const saved = localStorage.getItem("craftfolio_data");
     if (saved) {
       try { setData(JSON.parse(saved)); } catch {}
@@ -44,6 +66,16 @@ export default function App() {
   useEffect(() => {
     if (mounted) localStorage.setItem("craftfolio_data", JSON.stringify(data));
   }, [data, mounted]);
+
+  const handleAuth = (token, userData) => {
+    setAuthToken(token);
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setAuthToken(null);
+    setUser(null);
+  };
 
   const goTo = (i) => setStep(i);
   const next = () => setStep(s => Math.min(s + 1, STEPS.length - 1));
@@ -67,6 +99,23 @@ export default function App() {
     }
     setSaving(false);
   };
+
+  // Show loading spinner while checking auth
+  if (authLoading) {
+    return (
+      <div className="craftfolio-root" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '32px', marginBottom: '16px', animation: 'spin-slow 2s linear infinite', display: 'inline-block' }}>✦</div>
+          <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, color: '#0e0e14', fontSize: '16px' }}>Loading CraftFolio...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show auth page if not logged in
+  if (!user) {
+    return <AuthPage onAuth={handleAuth} />;
+  }
 
   return (
     <div className="craftfolio-root">
@@ -105,6 +154,20 @@ export default function App() {
             style={{ padding: "6px 12px", background: "#0e0e14", color: "#fff", borderRadius: "8px", fontSize: "12px", fontWeight: "bold", border: "none", cursor: "pointer" }}
           >
             {saving ? "Saving..." : "☁️ Save to Cloud"}
+          </button>
+          <div className="cf-user-badge" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px 4px 4px', background: 'rgba(255,77,28,0.08)', borderRadius: '999px', border: '1px solid rgba(255,77,28,0.15)' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #ff4d1c, #e8a020)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: '800', fontFamily: 'Syne, sans-serif' }}>
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#0e0e14', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name?.split(' ')[0]}</span>
+          </div>
+          <button
+            onClick={handleLogout}
+            style={{ padding: '6px 12px', background: 'transparent', color: '#ef4444', borderRadius: '8px', fontSize: '12px', fontWeight: '600', border: '1px solid rgba(239,68,68,0.3)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'DM Sans, sans-serif' }}
+            onMouseOver={e => { e.target.style.background = '#fef2f2'; e.target.style.borderColor = '#ef4444'; }}
+            onMouseOut={e => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'rgba(239,68,68,0.3)'; }}
+          >
+            Logout
           </button>
         </div>
       </header>
