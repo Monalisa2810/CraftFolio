@@ -40,7 +40,7 @@ export default function DetailsForm({ data, setData, next }) {
       <div className="cf-section-header">
         <div className="cf-section-eyebrow">Step 01</div>
         <h1 className="cf-section-title">Tell us your story</h1>
-        <p className="cf-section-sub">Fill in your details — your resume builds live as you type.</p>
+        <p className="cf-section-sub">Fill in your details - your resume builds live as you type.</p>
       </div>
 
       {/* Section tabs */}
@@ -67,12 +67,12 @@ export default function DetailsForm({ data, setData, next }) {
           </div>
           <div className="cf-card-body">
             <div className="cf-grid-2">
-              <Field label="Full Name *" value={data.personalInfo.name} onChange={(v) => updPI("name", v)} placeholder="Alex Johnson" />
-              <Field label="Email *" value={data.personalInfo.email} onChange={(v) => updPI("email", v)} placeholder="alex@email.com" />
+              <Field label="Full Name *" value={data.personalInfo.name} onChange={(v) => updPI("name", v)} placeholder="Monalisa Das" />
+              <Field label="Email *" value={data.personalInfo.email} onChange={(v) => updPI("email", v)} placeholder="monalisa@email.com" />
               <Field label="Phone" value={data.personalInfo.phone} onChange={(v) => updPI("phone", v)} placeholder="+91 98765 43210" />
               <Field label="Location" value={data.personalInfo.location} onChange={(v) => updPI("location", v)} placeholder="Ahmedabad, India" />
-              <Field label="LinkedIn URL" value={data.personalInfo.linkedin} onChange={(v) => updPI("linkedin", v)} placeholder="linkedin.com/in/alexjohnson" />
-              <Field label="GitHub URL" value={data.personalInfo.github} onChange={(v) => updPI("github", v)} placeholder="github.com/alexjohnson" />
+              <Field label="LinkedIn URL" value={data.personalInfo.linkedin} onChange={(v) => updPI("linkedin", v)} placeholder="linkedin.com/in/monalisadas" />
+              <Field label="GitHub URL" value={data.personalInfo.github} onChange={(v) => updPI("github", v)} placeholder="github.com/monalisadas" />
             </div>
           </div>
         </div>
@@ -100,10 +100,10 @@ export default function DetailsForm({ data, setData, next }) {
                   )}
                 </div>
                 <div className="cf-grid-2">
-                  <Field label="College / University" value={e.college} onChange={(v) => updItem("education", e.id, "college", v)} placeholder="IIT Bombay" />
+                  <Field label="College / University" value={e.college} onChange={(v) => updItem("education", e.id, "college", v)} placeholder="VIT Chennai" />
                   <Field label="Degree & Branch" value={e.degree} onChange={(v) => updItem("education", e.id, "degree", v)} placeholder="B.Tech Computer Science" />
                   <Field label="CGPA / Percentage" value={e.cgpa} onChange={(v) => updItem("education", e.id, "cgpa", v)} placeholder="8.7" />
-                  <Field label="Graduation Year" value={e.year} onChange={(v) => updItem("education", e.id, "year", v)} placeholder="2025" />
+                  <Field label="Graduation Year" value={e.year} onChange={(v) => updItem("education", e.id, "year", v)} placeholder="2028" />
                 </div>
               </div>
             ))}

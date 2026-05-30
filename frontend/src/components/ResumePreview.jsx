@@ -123,8 +123,8 @@ export default function ResumePreview({ data, template, next, prev }) {
                 ["LinkedIn", !!data.personalInfo.linkedin],
                 ["GitHub", !!data.personalInfo.github],
                 ["Summary / Objective", !!(data.summary || data.objective)],
-                ["Skills added", data.skills.length >= 5],
                 ["Education", data.education.some(e => e.college)],
+                ["Skills added", data.skills.length >= 5],
                 ["Projects", data.projects.some(p => p.title)],
               ].map(([label, ok]) => (
                 <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
@@ -186,6 +186,20 @@ function TemplateOrbital({ data }) {
             {summary || objective}
           </div>
         )}
+        {/* Education */}
+        {education.some(e => e.college) && (
+          <Section title="EDUCATION">
+            {education.filter(e => e.college).map(e => (
+              <div key={e.id} style={{ marginBottom: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontWeight: 700, fontSize: 12, fontFamily: "sans-serif" }}>{e.college}</span>
+                  <span style={{ fontSize: 10, color: "#666" }}>{e.year}</span>
+                </div>
+                <div style={{ fontSize: 11, color: "#444" }}>{e.degree}{e.cgpa ? ` · CGPA ${e.cgpa}` : ""}</div>
+              </div>
+            ))}
+          </Section>
+        )}
         {/* Skills */}
         {skills.length > 0 && (
           <Section title="SKILLS">
@@ -222,20 +236,6 @@ function TemplateOrbital({ data }) {
                 </div>
                 {p.github && <div style={{ fontSize: 10, color: "#ff4d1c" }}>{p.github}</div>}
                 {p.description && <div style={{ fontSize: 11, color: "#555", lineHeight: 1.6 }}>{p.description}</div>}
-              </div>
-            ))}
-          </Section>
-        )}
-        {/* Education */}
-        {education.some(e => e.college) && (
-          <Section title="EDUCATION">
-            {education.filter(e => e.college).map(e => (
-              <div key={e.id} style={{ marginBottom: 8 }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontWeight: 700, fontSize: 12, fontFamily: "sans-serif" }}>{e.college}</span>
-                  <span style={{ fontSize: 10, color: "#666" }}>{e.year}</span>
-                </div>
-                <div style={{ fontSize: 11, color: "#444" }}>{e.degree}{e.cgpa ? ` · CGPA ${e.cgpa}` : ""}</div>
               </div>
             ))}
           </Section>
